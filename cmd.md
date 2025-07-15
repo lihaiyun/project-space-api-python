@@ -12,3 +12,6 @@ Ctrl+Shift+P → Python: Select Interpreter → .venv
 
 Then check that flask is installed there:
 pip list
+
+Run:
+python -m src.app
