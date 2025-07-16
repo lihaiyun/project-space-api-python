@@ -8,6 +8,7 @@ from src.schemas.user_schema import UserSchema
 from src.schemas.auth_schema import UserRegisterSchema, UserLoginSchema
 from src.config import Config
 from src.utils.cookies import set_auth_cookie, clear_auth_cookie
+from src.utils.auth import token_required
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 user_schema = UserSchema()
@@ -20,7 +21,7 @@ def list_users():
     users = User.objects()
     return jsonify(users_schema.dump(users))
 
-@bp.route("/", methods=["POST"])
+@bp.route("/register", methods=["POST"])
 def register_user():
     try:
         # Use UserRegisterSchema for validation
@@ -58,7 +59,8 @@ def login_user():
         if user and check_password_hash(user.password, login_data['password']):
             # Generate JWT token
             payload = {
-                'user_id': str(user.id),
+                'id': str(user.id),
+                'name': user.name,
                 'email': user.email,
                 'exp': datetime.now(timezone.utc) + timedelta(days=Config.JWT_EXPIRATION_DAYS),
                 'iat': datetime.now(timezone.utc)
@@ -85,6 +87,18 @@ def login_user():
         return jsonify({"errors": err.messages}), 400
     except Exception as err:
         return jsonify({"error": str(err)}), 500
+
+@bp.route("/auth", methods=["GET"])
+@token_required
+def get_current_user(current_user):
+    """
+    Get current authenticated user information
+    Requires valid JWT token in cookie or Authorization header
+    """
+    return jsonify({
+        "authenticated": True,
+        "user": user_schema.dump(current_user)
+    }), 200
 
 @bp.route("/logout", methods=["POST"])
 def logout_user():

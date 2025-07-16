@@ -2,7 +2,6 @@ import jwt
 from functools import wraps
 from flask import request, jsonify
 from src.config import Config
-from src.models.user import User
 
 def token_required(f):
     """
@@ -23,10 +22,9 @@ def token_required(f):
         try:
             # Decode the token
             payload = jwt.decode(token, Config.JWT_SECRET_KEY, algorithms=['HS256'])
-            current_user_id = payload['user_id']
             
             # Get the user from database
-            current_user = User.objects(id=current_user_id).first()
+            current_user = payload
             if not current_user:
                 return jsonify({'error': 'User not found'}), 401
                 
