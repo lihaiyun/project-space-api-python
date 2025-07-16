@@ -4,11 +4,11 @@ python -m venv .venv
 Activate it
 .venv\Scripts\activate
 
-Install dependencies:
-pip install -r requirements.txt
-
 VS Code will usually detect .venv automatically. If not:
 Ctrl+Shift+P → Python: Select Interpreter → .venv
+
+Install dependencies:
+pip install -r requirements.txt
 
 Then check that flask is installed there:
 pip list
