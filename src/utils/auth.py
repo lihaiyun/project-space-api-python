@@ -13,13 +13,9 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
         
-        # Check for token in Authorization header
-        if 'Authorization' in request.headers:
-            auth_header = request.headers['Authorization']
-            try:
-                token = auth_header.split(" ")[1]  # Bearer <token>
-            except IndexError:
-                return jsonify({'error': 'Invalid token format'}), 401
+        # Check for token in cookies
+        if 'accessToken' in request.cookies:
+            token = request.cookies.get('accessToken')
         
         if not token:
             return jsonify({'error': 'Token is missing'}), 401
@@ -45,27 +41,3 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
     
     return decorated
-
-def get_current_user_from_token():
-    """
-    Helper function to get current user from token without decorator
-    Returns user object or None
-    """
-    token = None
-    
-    if 'Authorization' in request.headers:
-        auth_header = request.headers['Authorization']
-        try:
-            token = auth_header.split(" ")[1]
-        except IndexError:
-            return None
-    
-    if not token:
-        return None
-    
-    try:
-        payload = jwt.decode(token, Config.JWT_SECRET_KEY, algorithms=['HS256'])
-        user_id = payload['user_id']
-        return User.objects(id=user_id).first()
-    except:
-        return None

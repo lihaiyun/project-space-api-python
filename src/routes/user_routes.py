@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from marshmallow import ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -7,6 +7,7 @@ from src.models.user import User
 from src.schemas.user_schema import UserSchema
 from src.schemas.auth_schema import UserRegisterSchema, UserLoginSchema
 from src.config import Config
+from src.utils.cookies import set_auth_cookie, clear_auth_cookie
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 user_schema = UserSchema()
@@ -65,12 +66,18 @@ def login_user():
             
             token = jwt.encode(payload, Config.JWT_SECRET_KEY, algorithm='HS256')
             
-            # Return user data and token
-            return jsonify({
+            # Create response with user data
+            response_data = {
                 "message": "Login successful",
-                "user": user_schema.dump(user),
-                "token": token
-            }), 200
+                "user": user_schema.dump(user)
+            }
+            
+            response = make_response(jsonify(response_data), 200)
+            
+            # Set authentication cookie with environment-aware options
+            set_auth_cookie(response, token)
+            
+            return response
         else:
             return jsonify({"errors": {"credentials": ["Invalid email or password"]}}), 401
             
@@ -78,3 +85,12 @@ def login_user():
         return jsonify({"errors": err.messages}), 400
     except Exception as err:
         return jsonify({"error": str(err)}), 500
+
+@bp.route("/logout", methods=["POST"])
+def logout_user():
+    response = make_response(jsonify({"message": "Logout successful"}), 200)
+
+    # Clear authentication cookie with consistent options
+    clear_auth_cookie(response)
+    
+    return response
