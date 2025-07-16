@@ -24,4 +24,7 @@ app.register_blueprint(user_routes.bp)
 app.register_blueprint(project_routes.bp)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # This is only for development - use Gunicorn for production
+    print("Running in development mode...")
+    print("For production, use: gunicorn -c gunicorn.conf.py src.app:app")
+    app.run(debug=True, port=5000)
