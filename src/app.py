@@ -10,6 +10,10 @@ app.config.from_object(Config)
 CORS(app)
 connect(host=app.config["MONGODB_URI"])
 
+@app.route('/')
+def hello():
+    return {"message": "Hello! Welcome to the Project Space API"}
+
 app.register_blueprint(user_routes.bp)
 
 if __name__ == "__main__":
