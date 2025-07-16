@@ -1,9 +1,12 @@
 from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from datetime import datetime, timedelta, timezone
 from src.models.user import User
 from src.schemas.user_schema import UserSchema
 from src.schemas.auth_schema import UserRegisterSchema, UserLoginSchema
+from src.config import Config
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 user_schema = UserSchema()
@@ -52,10 +55,21 @@ def login_user():
         
         # Check if user exists and password is correct
         if user and check_password_hash(user.password, login_data['password']):
-            # Return user data without password using UserSchema
+            # Generate JWT token
+            payload = {
+                'user_id': str(user.id),
+                'email': user.email,
+                'exp': datetime.now(timezone.utc) + timedelta(days=Config.JWT_EXPIRATION_DAYS),
+                'iat': datetime.now(timezone.utc)
+            }
+            
+            token = jwt.encode(payload, Config.JWT_SECRET_KEY, algorithm='HS256')
+            
+            # Return user data and token
             return jsonify({
                 "message": "Login successful",
-                "user": user_schema.dump(user)
+                "user": user_schema.dump(user),
+                "token": token
             }), 200
         else:
             return jsonify({"errors": {"credentials": ["Invalid email or password"]}}), 401
