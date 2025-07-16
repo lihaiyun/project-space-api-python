@@ -12,3 +12,8 @@ class Config:
     IS_PRODUCTION = os.getenv("FLASK_ENV", "development") == "production"
     COOKIE_SECURE = IS_PRODUCTION
     COOKIE_SAMESITE = "None" if IS_PRODUCTION else "Lax"
+    
+    # CORS settings
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    CORS_ORIGINS = [FRONTEND_URL]
+    CORS_SUPPORTS_CREDENTIALS = True

@@ -7,7 +7,13 @@ from src.config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
-CORS(app)
+# Configure CORS with specific origins and credentials support
+CORS(app, 
+     origins=Config.CORS_ORIGINS,
+     supports_credentials=Config.CORS_SUPPORTS_CREDENTIALS,
+     allow_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'])
+
 connect(host=app.config["MONGODB_URI"])
 
 @app.route('/')
