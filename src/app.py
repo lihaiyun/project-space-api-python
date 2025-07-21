@@ -14,8 +14,11 @@ app.config['MAX_CONTENT_LENGTH'] = Config.MAX_CONTENT_LENGTH
 CORS(app, 
      origins=Config.CORS_ORIGINS,
      supports_credentials=Config.CORS_SUPPORTS_CREDENTIALS,
-     allow_headers=['Content-Type', 'Authorization'],
+     allow_headers=['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
      methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'])
+
+# Disable strict slashes to prevent redirects
+app.url_map.strict_slashes = False
 
 connect(host=app.config["MONGODB_URI"])
 
