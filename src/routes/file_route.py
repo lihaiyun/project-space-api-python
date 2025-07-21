@@ -5,6 +5,7 @@ import cloudinary.uploader
 import cloudinary.api
 from PIL import Image
 import os
+import urllib.parse
 from src.config import Config
 from src.utils.auth import token_required
 
@@ -86,10 +87,6 @@ def upload_image(current_user):
         # Prepare upload options
         upload_options = {
             'folder': folder,
-            'resource_type': 'image',
-            'format': 'auto',
-            'quality': 'auto:good',
-            'fetch_format': 'auto',
             'transformation': [
                 {'width': 1600, 'height': 900, 'crop': 'fill'},
                 {'quality': 'auto:good'}
@@ -113,7 +110,7 @@ def upload_image(current_user):
     except Exception as err:
         return jsonify({"error": f"Upload failed: {str(err)}"}), 500
 
-@bp.route("/info/<public_id>", methods=["GET"])
+@bp.route("info/<path:public_id>", methods=["GET"])
 @token_required
 def get_image_info(current_user, public_id):
     """
@@ -121,8 +118,9 @@ def get_image_info(current_user, public_id):
     Requires authentication
     """
     try:
-        # Replace URL encoding
-        public_id = public_id.replace("%2F", "/")
+        # Properly decode URL-encoded public_id
+        public_id = urllib.parse.unquote(public_id)
+        print(f"Decoded public_id: {public_id}")
         
         # Get resource info
         result = cloudinary.api.resource(public_id)
@@ -134,14 +132,14 @@ def get_image_info(current_user, public_id):
             "width": result['width'],
             "height": result['height'],
             "bytes": result['bytes'],
-            "createdAt": result['created_at'],
-            "uploadedAt": result.get('uploaded_at', None)
+            "createdAt": result['created_at']
         }), 200
         
     except Exception as err:
+        print(f"Error getting image info: {str(err)}")
         return jsonify({"error": f"Failed to get image info: {str(err)}"}), 500
 
-@bp.route("/delete/<public_id>", methods=["DELETE"])
+@bp.route("/<path:public_id>", methods=["DELETE"])
 @token_required
 def delete_image(current_user, public_id):
     """
@@ -149,8 +147,9 @@ def delete_image(current_user, public_id):
     Requires authentication
     """
     try:
-        # Replace URL encoding
-        public_id = public_id.replace("%2F", "/")
+        # Properly decode URL-encoded public_id
+        public_id = urllib.parse.unquote(public_id)
+        print(f"Deleting image with public_id: {public_id}")
         
         # Delete from Cloudinary
         result = cloudinary.uploader.destroy(public_id)
@@ -158,7 +157,7 @@ def delete_image(current_user, public_id):
         if result['result'] == 'ok':
             return jsonify({
                 "message": "Image deleted successfully",
-                "public_id": public_id
+                "imageId": public_id
             }), 200
         else:
             return jsonify({
@@ -167,23 +166,5 @@ def delete_image(current_user, public_id):
             }), 400
             
     except Exception as err:
+        print(f"Error deleting image: {str(err)}")
         return jsonify({"error": f"Delete failed: {str(err)}"}), 500
-
-@bp.route("/config", methods=["GET"])
-@token_required
-def get_upload_config(current_user):
-    """
-    Get upload configuration limits and settings
-    Requires authentication
-    """
-    try:
-        return jsonify({
-            "maxFileSize": Config.MAX_CONTENT_LENGTH,
-            "maxFileSizeMB": Config.MAX_CONTENT_IN_MB,
-            "allowedExtensions": list(Config.ALLOWED_EXTENSIONS),
-            "defaultFolder": Config.UPLOAD_FOLDER,
-            "supportedFormats": ["PNG", "JPG", "JPEG", "GIF", "WEBP"]
-        }), 200
-        
-    except Exception as err:
-        return jsonify({"error": f"Failed to get config: {str(err)}"}), 500
