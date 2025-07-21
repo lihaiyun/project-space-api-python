@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from src.models.project import Project
-from src.models.user import User
 from src.schemas.project_schema import ProjectSchema, ProjectInputSchema
 from src.utils.auth import token_required
 
