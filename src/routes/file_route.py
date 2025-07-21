@@ -47,7 +47,7 @@ def validate_image(file):
 
 @bp.route("/upload", methods=["POST"])
 @token_required
-def upload_image(current_user):
+def upload_image(_):
     """
     Upload image to Cloudinary
     Requires authentication
@@ -112,7 +112,7 @@ def upload_image(current_user):
 
 @bp.route("info/<path:public_id>", methods=["GET"])
 @token_required
-def get_image_info(current_user, public_id):
+def get_image_info(_, public_id):
     """
     Get image information from Cloudinary
     Requires authentication
@@ -141,7 +141,7 @@ def get_image_info(current_user, public_id):
 
 @bp.route("/<path:public_id>", methods=["DELETE"])
 @token_required
-def delete_image(current_user, public_id):
+def delete_image(_, public_id):
     """
     Delete image from Cloudinary
     Requires authentication
