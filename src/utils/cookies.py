@@ -27,11 +27,10 @@ def set_auth_cookie(response, token):
     return response
 
 def clear_auth_cookie(response):
-    """
-    Clear authentication cookie using Flask's clear_cookie method
-    """
-    response.clear_cookie(
+    response.set_cookie(
         'accessToken',
+        '',
+        expires=0,
         secure=Config.COOKIE_SECURE,
         samesite=Config.COOKIE_SAMESITE
     )

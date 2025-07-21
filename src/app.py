@@ -14,19 +14,6 @@ app.config['MAX_CONTENT_LENGTH'] = Config.MAX_CONTENT_LENGTH
 CORS(app, 
      origins=Config.CORS_ORIGINS,
      supports_credentials=Config.CORS_SUPPORTS_CREDENTIALS,
-     allow_headers=[
-         'Accept',
-         'Accept-Language', 
-         'Content-Language',
-         'Content-Type',
-         'Authorization',
-         'Origin',
-         'X-Requested-With',
-         'X-CSRFToken',
-         'X-HTTP-Method-Override',
-         'Cache-Control',
-         'Pragma'
-     ],
      methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
      expose_headers=['Set-Cookie', 'Content-Type', 'Authorization'])
 
