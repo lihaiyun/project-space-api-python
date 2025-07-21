@@ -17,3 +17,14 @@ class Config:
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
     CORS_ORIGINS = [FRONTEND_URL]
     CORS_SUPPORTS_CREDENTIALS = True
+    
+    # Cloudinary settings
+    CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+    CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
+    CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
+    
+    # File upload settings
+    MAX_CONTENT_IN_MB = 16  # 16MB max file size
+    MAX_CONTENT_LENGTH = MAX_CONTENT_IN_MB * 1024 * 1024  # Convert to bytes for Flask
+    UPLOAD_FOLDER = 'projects'
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
