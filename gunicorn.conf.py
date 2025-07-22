@@ -9,7 +9,7 @@ bind = f"0.0.0.0:{os.getenv('PORT', '5000')}"
 backlog = 2048
 
 # Worker processes
-workers = int(os.getenv('WORKERS', '1'))  # Number of worker processes
+workers = int(os.getenv('WORKERS', '2'))  # Increased default for production
 worker_class = "sync"
 worker_connections = 1000
 timeout = 30

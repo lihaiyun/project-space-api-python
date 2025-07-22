@@ -169,6 +169,49 @@ src/
 - Input validation and sanitization
 - CORS support for frontend integration
 
+## Production Deployment
+
+### Quick Start
+```bash
+# Windows
+start-production.bat
+
+# Linux/Mac
+chmod +x start-production.sh
+./start-production.sh
+
+# Manual
+gunicorn -c gunicorn.conf.py src.app:app
+```
+
+### Production Checklist
+
+Before deploying to production:
+
+1. **Environment Variables:**
+   ```bash
+   FLASK_ENV=production
+   JWT_SECRET_KEY=your-strong-secret-key-here
+   MONGODB_URI=your-production-mongodb-connection
+   FRONTEND_URL=https://your-frontend-domain.com
+   WORKERS=2  # Adjust based on CPU cores
+   ```
+
+2. **Security:**
+   - Use strong, unique JWT secret key
+   - Configure HTTPS (update `FRONTEND_URL` to https)
+   - Set proper CORS origins
+   - Use environment-specific MongoDB credentials
+
+3. **Performance:**
+   - Set `WORKERS` to 2x CPU cores (recommended)
+   - Configure load balancer if needed
+   - Monitor memory usage with `max_requests=1000`
+
+4. **Monitoring:**
+   - Check logs: Gunicorn logs to stdout/stderr
+   - Set `LOG_LEVEL=info` or `warning` for production
+
 ## Development
 
 The application runs in debug mode by default when using `python -m src.app`.
