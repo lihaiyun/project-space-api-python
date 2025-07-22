@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from mongoengine import connect
 from src.routes import user_routes, project_routes, file_route
@@ -21,6 +21,24 @@ CORS(app,
 app.url_map.strict_slashes = False
 
 connect(host=app.config["MONGODB_URI"])
+
+# Global Error Handlers
+@app.errorhandler(500)
+def internal_server_error(error):
+    """Handle internal server errors (500)"""
+    app.logger.error(f"Internal Server Error: {str(error)}")
+    return jsonify({
+        "error": "Internal server error",
+        "message": "Something went wrong on our end. Please try again later."
+    }), 500
+
+@app.errorhandler(404)
+def not_found_error(error):
+    """Handle not found errors (404)"""
+    return jsonify({
+        "error": "Not found",
+        "message": "The requested resource was not found."
+    }), 404
 
 @app.route('/')
 def hello():
