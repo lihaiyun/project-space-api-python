@@ -30,7 +30,7 @@ def register_user():
         # Check if email already exists
         existing_user = User.objects(email=user_data['email']).first()
         if existing_user:
-            return jsonify({"errors": {"email": ["Email already exists"]}}), 400
+            return jsonify({"message": "Email already registered"}), 400
         
         # Hash the password before saving
         user_data['password'] = generate_password_hash(user_data['password'])
@@ -44,7 +44,8 @@ def register_user():
     except ValidationError as err:
         return jsonify({"errors": err.messages}), 400
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"Error during user registration: {err}")
+        return jsonify({"message": "An error occurred during registration"}), 500
 
 @bp.route("/login", methods=["POST"])
 def login_user():
@@ -81,12 +82,13 @@ def login_user():
             
             return response
         else:
-            return jsonify({"errors": {"credentials": ["Invalid email or password"]}}), 401
+            return jsonify({"message": "Invalid email or password"}), 401
             
     except ValidationError as err:
         return jsonify({"errors": err.messages}), 400
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"Error during user login: {err}")
+        return jsonify({"message": "An error occurred during login"}), 500
 
 @bp.route("/auth", methods=["GET"])
 @token_required
