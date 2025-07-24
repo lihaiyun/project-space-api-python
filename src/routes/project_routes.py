@@ -144,7 +144,11 @@ def update_project(current_user, project_id):
         # Validate input data
         data = input_schema.load(request.get_json())
         
-        # Update all provided fields
+        # Remove owner from data to prevent ownership changes
+        if 'owner' in data:
+            del data['owner']
+        
+        # Update all provided fields (except owner)
         for field, value in data.items():
             if hasattr(project, field):
                 setattr(project, field, value)
