@@ -24,7 +24,7 @@ class Config:
     CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
     
     # File upload settings
-    MAX_CONTENT_IN_MB = 16  # 16MB max file size
+    MAX_CONTENT_IN_MB = 10  # 10MB max file size
     MAX_CONTENT_LENGTH = MAX_CONTENT_IN_MB * 1024 * 1024  # Convert to bytes for Flask
     UPLOAD_FOLDER = 'projects'
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
