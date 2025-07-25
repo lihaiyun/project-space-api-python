@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from mongoengine import connect
 from src.routes import user_routes, project_routes, file_route
 from src.config import Config
+from src.utils.error_handlers import register_error_handlers
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -22,47 +23,8 @@ app.url_map.strict_slashes = False
 
 connect(host=app.config["MONGODB_URI"])
 
-# Global Error Handlers
-@app.errorhandler(404)
-def not_found_error(error):
-    """Handle not found errors (404)"""
-    return jsonify({
-        "error": "Not found",
-        "message": "The requested resource was not found."
-    }), 404
-
-@app.errorhandler(Exception)
-def handle_unexpected_error(error):
-    """Handle all unexpected exceptions to prevent app crashes"""
-    import traceback
-    
-    error_msg = f"Unexpected Error: {str(error)}"
-    error_type = type(error).__name__
-    
-    # Print detailed error info to console
-    print(f"🔴 EXCEPTION CAUGHT: {error_msg}")
-    print(f"📍 Error Type: {error_type}")
-    
-    if app.debug:
-        print("📋 Stack Trace:")
-        traceback.print_exc()
-    
-    # Log the error with full stack trace
-    app.logger.error(error_msg, exc_info=True)
-    
-    # Return appropriate response based on environment
-    if app.debug:
-        return jsonify({
-            "error": "Unexpected error",
-            "message": str(error),
-            "type": error_type,
-            "debug": True
-        }), 500
-    else:
-        return jsonify({
-            "error": "Internal server error",
-            "message": "An unexpected error occurred. Please try again later."
-        }), 500
+# Register comprehensive error handlers from utils
+register_error_handlers(app)
 
 @app.route('/')
 def hello():
